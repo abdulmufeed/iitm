@@ -1,0 +1,42 @@
+name: Matrix Build with Artifacts (Python)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    name: Matrix Build Job
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']  # 3 variants as required
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: matrix-229ad0e
+        run: echo "Building for Python version ${{ matrix.python-version }}"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Generate build artifact
+        run: |
+          echo "Build output for Python ${{ matrix.python-version }}" > build-output-${{ matrix.python-version }}.txt
+          echo "Timestamp: $(date)" >> build-output-${{ matrix.python-version }}.txt
+          echo "Python path: $(which python3)" >> build-output-${{ matrix.python-version }}.txt
+          echo "Python version: $(python3 --version)" >> build-output-${{ matrix.python-version }}.txt
+
+      - name: Verify artifact content
+        run: cat build-output-${{ matrix.python-version }}.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-229ad0e-py${{ matrix.python-version }}
+          path: build-output-${{ matrix.python-version }}.txt
